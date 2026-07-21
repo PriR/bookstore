@@ -3,6 +3,7 @@ package com.store.bookstore.service.impl;
 import com.store.bookstore.dto.CartDTO;
 import com.store.bookstore.dto.CartItemDTO;
 import com.store.bookstore.entities.Cart;
+import com.store.bookstore.exceptions.CartNotFoundException;
 import com.store.bookstore.exceptions.ResourceNotFoundException;
 import com.store.bookstore.repository.BookRepository;
 import com.store.bookstore.repository.CartRepository;
@@ -54,7 +55,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartDTO findCartByCustomerId(Long customerId) {
-        Cart cart = cartRepository.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
+        Cart cart = cartRepository.findById(customerId).orElseThrow(() -> new CartNotFoundException("Cart not found"));
         return new CartDTO(cart.getId(), cart.getCustomerId(), cart.getItems());
     }
 
