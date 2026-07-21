@@ -1,5 +1,6 @@
 package com.store.bookstore.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,10 @@ public class Customer {
     private String lastName;
 
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    private String role = "ROLE_CUSTOMER";
 
     public Customer(@NotNull String email, @NotNull String firstName, @NotNull String lastName, @Nullable String password) {
         this.email = email;

@@ -1,13 +1,22 @@
 package com.store.bookstore.service.impl;
 
+import com.store.bookstore.dto.AuthResponseDTO;
+import com.store.bookstore.dto.CustomerAuthDTO;
 import com.store.bookstore.dto.CustomerDTO;
 import com.store.bookstore.entities.Customer;
+import com.store.bookstore.exceptions.CustomerAlreadyExistsException;
+import com.store.bookstore.exceptions.CustomerNotFoundException;
 import com.store.bookstore.repository.CustomerRepository;
+import com.store.bookstore.service.AuthService;
 import com.store.bookstore.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,15 +25,16 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     @Override
-    public CustomerDTO createCustomer(CustomerDTO customerDTO) {
+    public AuthResponseDTO createCustomer(CustomerDTO customerDTO) {
         if (customerDTO.email() == null || customerDTO.email().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
+            throw new CustomerAlreadyExistsException("Email is required");
         }
 
         if (customerRepository.existsByEmail(customerDTO.email())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new CustomerAlreadyExistsException("Email already exists");
         }
         // TODO: validate password size
 
@@ -35,15 +45,8 @@ public class CustomerServiceImpl implements CustomerService {
                 passwordEncoder.encode(customerDTO.password())
         );
 
-        Customer createdCustomer = customerRepository.save(customer);
-
-        return new CustomerDTO(
-                createdCustomer.getId(),
-                createdCustomer.getEmail(),
-                createdCustomer.getFirstName(),
-                createdCustomer.getLastName(),
-                null
-        );
+        customerRepository.save(customer);
+        return authService.registerUser(customerDTO);
     }
 
     @Override
@@ -56,5 +59,32 @@ public class CustomerServiceImpl implements CustomerService {
                 customer.getLastName(),
                 null
         )).toList();
+    }
+
+    @Override
+    public UserDetails loadUserByEmail(String email) throws CustomerNotFoundException {
+        Customer user = customerRepository.findByEmail(email);
+        if (user == null) {
+            throw new CustomerNotFoundException("Customer not found with this email: " + email);
+        }
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                authorities);
+    }
+
+    @Override
+    public CustomerAuthDTO findUserByEmail(String email) {
+        Customer customer = customerRepository.findByEmail(email);
+        if (customer == null) {
+            throw new CustomerNotFoundException("Customer not found with this email: " + email);
+        }
+        return new CustomerAuthDTO(
+                customer.getId(),
+                customer.getEmail(),
+                customer.getFirstName(),
+                customer.getLastName()
+        );
     }
 }

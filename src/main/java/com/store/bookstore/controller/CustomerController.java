@@ -4,10 +4,12 @@ import com.store.bookstore.dto.CartDTO;
 import com.store.bookstore.dto.CustomerDTO;
 import com.store.bookstore.service.CartService;
 import com.store.bookstore.service.CustomerService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -18,12 +20,6 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final CartService cartService;
-
-    @PostMapping("/register")
-    public ResponseEntity<CustomerDTO> registerCustomer(@Valid @RequestBody CustomerDTO customerDTO) {
-        CustomerDTO customerDTOResponse = customerService.createCustomer(customerDTO);
-        return ResponseEntity.ok(customerDTOResponse);
-    }
 
     @GetMapping
     public ResponseEntity<List<CustomerDTO>> getAllCustomers() {
