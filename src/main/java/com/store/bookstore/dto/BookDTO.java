@@ -9,6 +9,6 @@ public record BookDTO(
         @NotNull Long id,
         @NotBlank String title,
         @NotNull BigDecimal price,
-        @NotBlank AuthorDTO author
+        @NotNull AuthorDTO author
 ) {
 }

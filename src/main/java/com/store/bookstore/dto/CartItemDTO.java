@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 public record CartItemDTO(
         Long id,
         @NotNull Long cartId,
-        @NotNull Long bookId,
-        @NotNull int quantity,
+        BookDTO book,
+        @NotNull Integer quantity,
         @NotNull BigDecimal price
 ) {
 }

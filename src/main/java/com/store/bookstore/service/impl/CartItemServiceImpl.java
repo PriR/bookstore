@@ -1,6 +1,10 @@
 package com.store.bookstore.service.impl;
 
+import com.store.bookstore.dto.AuthorDTO;
+import com.store.bookstore.dto.BookDTO;
 import com.store.bookstore.dto.CartItemDTO;
+import com.store.bookstore.entities.Author;
+import com.store.bookstore.entities.Book;
 import com.store.bookstore.entities.CartItem;
 import com.store.bookstore.repository.CartItemRepository;
 import com.store.bookstore.service.CartItemService;
@@ -29,18 +33,27 @@ public class CartItemServiceImpl implements CartItemService {
     @Override
     @Transactional
     public CartItemDTO createCartItem(CartItemDTO cartItemDTO) {
-        List<CartItem> cartItemList = cartItemRepository.findByCartAndBookAndPrice(cartItemDTO.cartId(), cartItemDTO.bookId(), cartItemDTO.price());
+        List<CartItem> cartItemList = cartItemRepository.findByCartAndBookIdAndPrice(cartItemDTO.cartId(), cartItemDTO.book().id(), cartItemDTO.price());
         if (cartItemList.isEmpty()) {
             CartItem cartItem = new CartItem();
             cartItem.setCart(cartItemDTO.cartId());
-            cartItem.setBook(cartItemDTO.bookId());
+            cartItem.setBook(new Book(
+                    cartItemDTO.book().id(),
+                    cartItemDTO.book().title(),
+                    cartItemDTO.book().price(),
+                    new Author(
+                            cartItemDTO.book().author().id(),
+                            cartItemDTO.book().author().firstName(),
+                            cartItemDTO.book().author().lastName()
+                    )
+            ));
             cartItem.setQuantity(cartItemDTO.quantity());
             cartItem.setPrice(cartItemDTO.price());
             return createUpdateCartItem(cartItem);
 
         } else {
             CartItem cartItem = cartItemList.get(0);
-            cartItem.setQuantity(cartItem.getQuantity() + cartItemDTO.quantity());
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
             return createUpdateCartItem(cartItem);
         }
     }
@@ -51,7 +64,16 @@ public class CartItemServiceImpl implements CartItemService {
         return new CartItemDTO(
                 createdCartItem.getId(),
                 createdCartItem.getCart(),
-                createdCartItem.getBook(),
+                new BookDTO(
+                        createdCartItem.getBook().getId(),
+                        createdCartItem.getBook().getTitle(),
+                        createdCartItem.getBook().getPrice(),
+                        new AuthorDTO(
+                                createdCartItem.getBook().getAuthor().getId(),
+                                createdCartItem.getBook().getAuthor().getFirstName(),
+                                createdCartItem.getBook().getAuthor().getLastName()
+                        )
+                ),
                 createdCartItem.getQuantity(),
                 createdCartItem.getPrice()
         );

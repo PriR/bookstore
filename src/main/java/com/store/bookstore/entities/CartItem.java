@@ -18,9 +18,9 @@ public class CartItem {
 //    @JoinColumn(name = "cart_id", nullable = false)
     private Long cart;
 
-//    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-//    @JoinColumn(name = "book_id", nullable = false)
-    private Long book;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "book_id", nullable = false)
+    private Book book;
 
     @Column(nullable = false)
     private Integer quantity;

@@ -55,7 +55,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartDTO findCartByCustomerId(Long customerId) {
-        Cart cart = cartRepository.findById(customerId).orElseThrow(() -> new CartNotFoundException("Cart not found"));
+        Cart cart = cartRepository.findCartByCustomerId(customerId).orElseThrow(() -> new CartNotFoundException("Cart not found"));
         return new CartDTO(cart.getId(), cart.getCustomerId(), cart.getItems());
     }
 
@@ -79,7 +79,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartDTO addItemToCart(Long customerId, CartItemDTO cartItemDTO) {
-        bookRepository.findById(cartItemDTO.bookId()).orElseThrow(() -> new BookNotFoundException("Book not found"));
+        bookRepository.findById(cartItemDTO.book().id()).orElseThrow(() -> new BookNotFoundException("Book not found"));
         Optional<Cart> cart = cartRepository.findById(cartItemDTO.cartId());
 
         if (cart.isEmpty()) {
