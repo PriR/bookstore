@@ -1,12 +1,14 @@
 package com.store.bookstore.service.impl;
 
-import com.store.bookstore.dto.*;
+import com.store.bookstore.dto.CartItemDTO;
 import com.store.bookstore.entities.CartItem;
 import com.store.bookstore.repository.CartItemRepository;
 import com.store.bookstore.service.CartItemService;
-import jakarta.validation.constraints.NotNull;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -21,17 +23,30 @@ public class CartItemServiceImpl implements CartItemService {
     /**
      *
      * @param cartItemDTO
-     * @return
-     * TODO: create cart item for cart and customer only if it doesn't exist. If it exists, increment quantity
+     * @return TODO: create cart item for cart and customer only if it doesn't exist. If it exists, increment quantity
      *
      */
     @Override
+    @Transactional
     public CartItemDTO createCartItem(CartItemDTO cartItemDTO) {
-        CartItem cartItem = new CartItem();
-        cartItem.setCart(cartItemDTO.cartId());
-        cartItem.setBook(cartItemDTO.bookId());
-        cartItem.setQuantity(cartItemDTO.quantity());
-        cartItem.setPrice(cartItemDTO.price());
+        List<CartItem> cartItemList = cartItemRepository.findByCartAndBookAndPrice(cartItemDTO.cartId(), cartItemDTO.bookId(), cartItemDTO.price());
+        if (cartItemList.isEmpty()) {
+            CartItem cartItem = new CartItem();
+            cartItem.setCart(cartItemDTO.cartId());
+            cartItem.setBook(cartItemDTO.bookId());
+            cartItem.setQuantity(cartItemDTO.quantity());
+            cartItem.setPrice(cartItemDTO.price());
+            return createUpdateCartItem(cartItem);
+
+        } else {
+            CartItem cartItem = cartItemList.get(0);
+            cartItem.setQuantity(cartItem.getQuantity() + cartItemDTO.quantity());
+            return createUpdateCartItem(cartItem);
+        }
+    }
+
+    @Transactional
+    public CartItemDTO createUpdateCartItem(CartItem cartItem) {
         CartItem createdCartItem = cartItemRepository.save(cartItem);
         return new CartItemDTO(
                 createdCartItem.getId(),
@@ -40,6 +55,8 @@ public class CartItemServiceImpl implements CartItemService {
                 createdCartItem.getQuantity(),
                 createdCartItem.getPrice()
         );
+    }
+
 
 //        return new CartItemDTO(
 //                createdCartItem.getId(),
@@ -75,5 +92,4 @@ public class CartItemServiceImpl implements CartItemService {
 //                createdCartItem.getQuantity(),
 //                createdCartItem.getPrice()
 //        );
-    }
 }

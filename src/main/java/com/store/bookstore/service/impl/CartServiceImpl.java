@@ -3,8 +3,8 @@ package com.store.bookstore.service.impl;
 import com.store.bookstore.dto.CartDTO;
 import com.store.bookstore.dto.CartItemDTO;
 import com.store.bookstore.entities.Cart;
+import com.store.bookstore.exceptions.BookNotFoundException;
 import com.store.bookstore.exceptions.CartNotFoundException;
-import com.store.bookstore.exceptions.ResourceNotFoundException;
 import com.store.bookstore.repository.BookRepository;
 import com.store.bookstore.repository.CartRepository;
 import com.store.bookstore.service.CartItemService;
@@ -79,7 +79,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartDTO addItemToCart(Long customerId, CartItemDTO cartItemDTO) {
-        bookRepository.findById(cartItemDTO.bookId()).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+        bookRepository.findById(cartItemDTO.bookId()).orElseThrow(() -> new BookNotFoundException("Book not found"));
         Optional<Cart> cart = cartRepository.findById(cartItemDTO.cartId());
 
         if (cart.isEmpty()) {
@@ -90,7 +90,7 @@ public class CartServiceImpl implements CartService {
 
     CartDTO retrieveCartByCustomerId(Long customerId, CartItemDTO cartItemDTO) {
         cartItemService.createCartItem(cartItemDTO);
-        Cart cart = cartRepository.getCartsByCustomerId(customerId);
+        Cart cart = cartRepository.getCartByCustomerId(customerId);
         return new CartDTO(
                 cart.getId(),
                 cart.getCustomerId(),
