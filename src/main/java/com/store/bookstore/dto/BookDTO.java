@@ -1,13 +1,14 @@
 package com.store.bookstore.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
 public record BookDTO(
-        @NotBlank Long id,
+        @NotNull Long id,
         @NotBlank String title,
-        @NotBlank BigDecimal price,
+        @NotNull BigDecimal price,
         @NotBlank AuthorDTO author
 ) {
 }
