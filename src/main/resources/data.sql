@@ -1,5 +1,3 @@
-INSERT INTO CUSTOMER (EMAIL, FIRST_NAME, LAST_NAME, PASSWORD) VALUES ( 'priscilas@ats4it.com', 'Priscila', 'Rodrigues', 'test');
-
 INSERT INTO AUTHOR (FIRST_NAME, LAST_NAME) VALUES ( 'George', 'Orwell');
 INSERT INTO AUTHOR (FIRST_NAME, LAST_NAME) VALUES ( 'Another', 'Author');
 INSERT INTO AUTHOR (FIRST_NAME, LAST_NAME) VALUES ( 'Jane', 'Austin');

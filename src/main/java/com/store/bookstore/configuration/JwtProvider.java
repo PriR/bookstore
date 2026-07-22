@@ -15,11 +15,11 @@ import java.util.Set;
 public class JwtProvider {
     static SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
 
-    public static String generateToken(Authentication auth, CustomerAuthDTO custumerAuthDTO) {
+    public static String generateToken(Authentication auth, CustomerAuthDTO customerAuthDTO) {
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
         String roles = populateAuthorities(authorities);
         return Jwts.builder().issuedAt(new Date()).expiration(new Date(new Date().getTime() + 86400000))
-                .claim("customer", custumerAuthDTO)
+                .claim("customer", customerAuthDTO)
                 .claim("authorities", roles)
                 .signWith(key)
                 .compact();
