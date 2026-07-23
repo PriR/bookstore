@@ -1,15 +1,10 @@
 package com.store.bookstore.service.impl;
 
 import com.store.bookstore.dto.CartDTO;
-import com.store.bookstore.dto.CartItemDTO;
 import com.store.bookstore.entities.Cart;
-import com.store.bookstore.exceptions.BookNotFoundException;
 import com.store.bookstore.exceptions.CartNotFoundException;
-import com.store.bookstore.repository.BookRepository;
 import com.store.bookstore.repository.CartRepository;
-import com.store.bookstore.service.CartItemService;
 import com.store.bookstore.service.CartService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +14,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    private final BookRepository bookRepository;
-    private final CartItemService cartItemService;
 
     /**
      *
@@ -64,44 +57,4 @@ public class CartServiceImpl implements CartService {
         cartRepository.deleteById(customerId);
     }
 
-    /**
-     *
-     * @param customerId  customer
-     * @param cartItemDTO cart item
-     *                    Method that handles creation of cart items
-     *                    Validate first if book exists:
-     *                    If not, exception book not found
-     *                    Otherwise:
-     *                    If cart exists, add item into cart
-     *                    If cart does not exist, create cart and add item into cart
-     * @return created cart CartDTO
-     */
-    @Override
-    @Transactional
-    public CartDTO addItemToCart(Long customerId, CartItemDTO cartItemDTO) {
-        bookRepository.findById(cartItemDTO.book().id()).orElseThrow(() -> new BookNotFoundException("Book not found"));
-        Optional<Cart> cart = cartRepository.findById(cartItemDTO.cartId());
-
-        if (cart.isEmpty()) {
-            cartRepository.save(new Cart(customerId));
-        }
-        return retrieveCartByCustomerId(customerId, cartItemDTO);
-    }
-
-    CartDTO retrieveCartByCustomerId(Long customerId, CartItemDTO cartItemDTO) {
-        cartItemService.createCartItem(cartItemDTO);
-        Cart cart = cartRepository.getCartByCustomerId(customerId);
-        return new CartDTO(
-                cart.getId(),
-                cart.getCustomerId(),
-                cart.getItems()
-        );
-    }
-
-
-    @Override
-    @Transactional
-    public CartDTO removeItemFromCart(Long customerId, CartItemDTO cartItemDTO) {
-        return null;
-    }
 }

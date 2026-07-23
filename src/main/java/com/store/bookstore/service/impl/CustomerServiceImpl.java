@@ -12,7 +12,6 @@ import com.store.bookstore.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +36,6 @@ public class CustomerServiceImpl implements CustomerService {
             throw new CustomerAlreadyExistsException("Email already exists");
         }
         // TODO: validate password size
-
         Customer customer = new Customer(
                 customerDTO.email(),
                 customerDTO.firstName(),
@@ -47,18 +45,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerRepository.save(customer);
         return authService.registerUser(customerDTO);
-    }
-
-    @Override
-    public List<CustomerDTO> getAllCustomers() {
-        List<Customer> customers = customerRepository.findAll();
-        return customers.stream().map(customer -> new CustomerDTO(
-                customer.getId(),
-                customer.getEmail(),
-                customer.getFirstName(),
-                customer.getLastName(),
-                null
-        )).toList();
     }
 
     @Override
