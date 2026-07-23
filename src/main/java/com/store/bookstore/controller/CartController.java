@@ -34,21 +34,13 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
+    // TODO: move to cart item controller
     @PatchMapping("/customer/{customerId}/add-item") // TODO: recheck REST naming convention - evolve later to also get if substraction or addition
     public ResponseEntity<CartDTO> addItemToCart(
             @PathVariable Long customerId,
             @Valid @RequestBody CartItemDTO cartItemDTO
     ) {
         CartDTO createdCartItemDTO = cartService.addItemToCart(customerId, cartItemDTO);
-        return ResponseEntity.ok().body(createdCartItemDTO);
-    }
-
-    @PatchMapping("/customer/{customerId}/remove-item") // TODO: recheck REST naming convention - evolve later to also get if substraction or addition
-    public ResponseEntity<CartDTO> removeItemFromCart(
-            @PathVariable Long customerId,
-            @Valid @RequestBody CartItemDTO cartItemDTO
-    ) {
-        CartDTO createdCartItemDTO = cartService.removeItemFromCart(customerId, cartItemDTO);
         return ResponseEntity.ok().body(createdCartItemDTO);
     }
 

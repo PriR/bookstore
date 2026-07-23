@@ -19,11 +19,6 @@ import java.util.List;
 public class CartItemServiceImpl implements CartItemService {
 
     private CartItemRepository cartItemRepository;
-
-//    Boolean cartItemExist(Long cartItemId) {
-//        return cartItemRepository.existsById(cartItemId);
-//    }
-
     /**
      *
      * @param cartItemDTO
@@ -58,6 +53,13 @@ public class CartItemServiceImpl implements CartItemService {
         }
     }
 
+    @Override
+    public Long deleteCartItemById(Long cartItemId) {
+        // TODO: check if cart item exists, only then delete cart item
+        cartItemRepository.deleteById(cartItemId);
+        return cartItemId;
+    }
+
     @Transactional
     public CartItemDTO createUpdateCartItem(CartItem cartItem) {
         CartItem createdCartItem = cartItemRepository.save(cartItem);
@@ -79,39 +81,18 @@ public class CartItemServiceImpl implements CartItemService {
         );
     }
 
+    @Override
+    public Long decreaseQuantityCartItemById(Long cartItemId) {
+        cartItemRepository.findById(cartItemId).ifPresent(cartItem -> {
+            if (cartItem.getQuantity() == 1) {
+                cartItemRepository.delete(cartItem);
+            } else {
+                cartItem.setQuantity(cartItem.getQuantity() - 1);
+                cartItemRepository.save(cartItem);
+            }
+        });
+        return cartItemId;
+    }
 
-//        return new CartItemDTO(
-//                createdCartItem.getId(),
-//                new CartDTO(
-//                        createdCartItem.getId(),
-//                        createdCartItem.getCart()
-//                        createdCartItem.getCart().getId(),
-//                        createdCartItem.getCart(),
-//                        createdCartItem.getCart().getCustomer(),
-//                        createdCartItem.getCart().getCustomer().getId(),
-//                        new CustomerDTO(
-//                                createdCartItem.getCart().getCustomer().getId(),
-//                                createdCartItem.getCart().getCustomer().getEmail(),
-//                                createdCartItem.getCart().getCustomer().getFirstName(),
-//                                createdCartItem.getCart().getCustomer().getLastName(),
-//                                null
-//                        ),
-//                        createdCartItem.get
 
-//                ),
-//                new BookDTO(
-//                        createdCartItem.getBook().getId(),
-//                        createdCartItem.getBook().getTitle(),
-//                        createdCartItem.getBook().getPrice().toString(),
-//                        createdCartItem.getBook().getQuantityInStock(),
-//                        new AuthorDTO(
-//                                createdCartItem.getBook().getAuthor().getId(),
-//                                createdCartItem.getBook().getAuthor().getFirstName(),
-//                                createdCartItem.getBook().getAuthor().getLastName()
-//                        )
-//
-//                ),
-//                createdCartItem.getQuantity(),
-//                createdCartItem.getPrice()
-//        );
 }
